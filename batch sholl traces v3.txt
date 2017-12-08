@@ -1,0 +1,58 @@
+
+//setBatchMode(true);
+
+// Select images folder containing both folders with the images containing soma and render paths
+dir = getDirectory("Choose a Directory ");
+
+// Create folder save images with render paths without soma
+
+savefolder = getDirectory("Choose a Directory ");
+
+
+listA = getFileList(dir);
+
+
+// Analysis
+
+for (i = 0, j = i; i < listA.length; i++, j++) {
+	if (endsWith(listA[i], ".traces")) {
+	
+	name_image=File.getName(dir + listA[i]);
+
+	run("Sholl Analysis (Tracings)...", "traces/(e)swc=C:\\data\\test\\\\"+name_image+" load center=[Start of main path] radius=10 enclosing=1 #_primary=[] infer linear polynomial=[Best fitting degree] most normalizer=Area/Volume directory=[]");
+	
+	
+	name_plot=getTitle();
+	
+	csv_data=substring(name_plot,27,lengthOf(name_plot))+ "_Sholl-Profiles";
+	
+	selectWindow(csv_data);  // in order to save the results table that sholl analysis generates we need to rename its name to "Results"
+	IJ.renameResults("Results"); 
+	saveAs("Results", savefolder + substring(name_image,0,lengthOf(name_image)-7) +"_Sholl-Profiles.csv");
+	
+	
+	
+	
+	//add radius and intersections to new results table (each column is one cell)
+	if (i==0){
+	for (row=0; row<nResults; row++) { 
+	
+	if(row==0){radius_values=Array.concat("Radius", getResult("Radius", row));}
+	else
+	radius_values=Array.concat(radius_values, getResult("Radius", row));}	
+	Array.print(radius_values);
+}
+	
+	
+	for (row=0; row<nResults; row++) { 
+	
+	if(row==0){Inter_values=Array.concat(substring(name_image,0,lengthOf(name_image)-7),getResult("Inters.", row));}
+	else
+	Inter_values=Array.concat(Inter_values, getResult("Inters.", row));}	
+	Array.print(Inter_values);
+
+	}
+}
+	selectWindow("Log");
+	saveAs("Text", savefolder + "Intersections all neurons");
+
